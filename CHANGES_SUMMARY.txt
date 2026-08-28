@@ -1,0 +1,147 @@
+================================================================================
+BoolSynth Project — Complete Engineering & Expansion Summary
+================================================================================
+
+Date: August 2026
+Project: BoolSynth (Digital Logic Suite)
+Architecture: Pure Client-Side (HTML5, Vanilla CSS, Vanilla JavaScript)
+No Build Tools / Zero Dependencies Required
+
+--------------------------------------------------------------------------------
+1. TOP-LEVEL NAVIGATION ARCHITECTURE (index.html, ui.js, style.css)
+--------------------------------------------------------------------------------
+- Engineered a modular top-level tabbed navigation system with 4 dedicated suites:
+    1. ⚡ BoolSynth      — Boolean Function Synthesizer & Circuit Generator
+    2. ⊞ K-Maps         — Interactive Karnaugh Maps (2, 3, 4 Variables)
+    3. ∑ Arithmetic     — 1–4 Bit Adders & Subtractors
+    4. 🔀 Multiplexers   — 2:1, 4:1, 8:1 Signal Routing & Universal Logic
+- Preserved 100% of existing synthesizer functionality by cleanly encapsulating
+  original content into `#module-boolsynth` without modifying internal logic.
+- Implemented deep-linking & persistent URL hash synchronization:
+  `#boolsynth`, `#kmaps`, `#arithmetic`, `#mux`.
+- Created `ui.js` as the global navigation controller and cross-module bridge.
+
+--------------------------------------------------------------------------------
+2. MODULE 1: INTERACTIVE K-MAP SOLVER (kmaps.js)
+--------------------------------------------------------------------------------
+- Variable Grids:
+  * 2-Variable (A, B)       -> 2x2 matrix (m0..m3)
+  * 3-Variable (A, B, C)    -> 2x4 matrix with Gray-code columns (00, 01, 11, 10)
+  * 4-Variable (A, B, C, D) -> 4x4 matrix with dual Gray-code coordinates (m0..m15)
+- Interactive Cells:
+  * Click to cycle states: 0 -> 1 -> X (Don't Care) -> 0.
+  * Individual minterm badges (m0, m1, ...) and row/col Gray-code header labels.
+- Toroidal Minimization & Grouping Engine:
+  * Detects all maximal power-of-2 sub-cubes (16, 8, 4, 2, 1).
+  * Natively handles horizontal wrap-around, vertical wrap-around, and 4-corner
+    loop detection (m0, m2, m8, m10).
+  * Extracts Essential Prime Implicants and computes exact minimal covers.
+- Visual Overlays & Interactivity:
+  * Curated neon glowing loops (Emerald, Amber, Cyan, Rose, Violet, Coral).
+  * Hovering any row in the Prime Implicants table dynamically illuminates that
+    specific loop on the K-Map.
+- Outputs & Bridges:
+  * Real-time minimal Sum of Products (SOP) and Product of Sums (POS) equations.
+  * Canonical representations: Σm(...) + d(...) and ΠM(...) · d(...).
+  * "Synthesize Circuit in BoolSynth" button: One-click export of K-Map minterms
+    directly into BoolSynth to generate live gate-level circuit schematics.
+  * Presets: XOR, Majority Vote, Odd Parity, BCD Valid, 4-Corners, 7-Segment displays.
+
+--------------------------------------------------------------------------------
+3. MODULE 2: BINARY ARITHMETIC ENGINE (arithmetic.js)
+--------------------------------------------------------------------------------
+- Multi-Bit Ripple Carry Adder & Subtractor (1, 2, 3, 4 Bits):
+  * Operation Modes: ADD (A + B) vs SUBTRACT (A − B).
+  * Interactive 0/1 bit toggle buttons for Operand A, Operand B, and Carry-In (Cin).
+  * Real-time numerical conversions: Unsigned Decimal, Signed 2's Complement
+    (-8 to +7 for 4-bit), and Hexadecimal.
+- Dynamic Carry / Borrow In Toggle:
+  * In Addition: Interactive Cin adds +1 to LSB (A + B + Cin).
+  * In Subtraction with Cin = 1: Standard 2's complement subtraction (A + ~B + 1 = A − B).
+  * In Subtraction with Cin = 0: 1's complement subtraction / subtract with borrow-in
+    (A + ~B + 0 = A − B − 1).
+  * Dynamic Active Formula Banner displaying live mathematical evaluation.
+- Stage-by-Stage Ripple Carry Visualizer:
+  * Side-by-side Full Adder slices (FA3 <- FA2 <- FA1 <- FA0).
+  * Displays per-stage inputs (Ai, Bi, Ci), XOR negation (~Bi) in subtraction,
+    sum/difference bits, and animated carry propagation (C0 -> C1 -> ... -> Cn).
+- Comprehensive Mathematical Status Flags:
+  * V (Signed Overflow Flag): V = Cn ^ Cn-1 (correctly triggers when true math
+    result exceeds n-bit signed bounds).
+  * Z (Zero Flag): Triggers when all result bits are 0.
+  * N (Negative Sign Flag): Indicates MSB of output.
+  * Bout (Subtractor Borrow Out): Bout = ~Cn (Cn=1 -> No borrow; Cn=0 -> Borrow).
+- Formatted Column Math:
+  * Displays formatted vertical binary calculation with carry/borrow rows.
+- Discrete 1-Bit Gate Units:
+  * Interactive dedicated views & truth tables for Half Adder, Full Adder,
+    Half Subtractor, and Full Subtractor.
+
+--------------------------------------------------------------------------------
+4. MODULE 3: MULTIPLEXER SIMULATOR (mux.js)
+--------------------------------------------------------------------------------
+- Supported Configurations:
+  * 2:1 MUX (1 Select line S0, 2 Data inputs D0..D1)
+  * 4:1 MUX (2 Select lines S1, S0, 4 Data inputs D0..D3)
+  * 8:1 MUX (3 Select lines S2, S1, S0, 8 Data inputs D0..D7)
+  * Active-Low Enable Strobe (Ē): 0 = Enabled, 1 = Disabled.
+- Interactive Visual Signal Routing:
+  * Interactive trapezoidal MUX schematic.
+  * Active routed channel illuminates with a glowing neon signal pulse from
+    selected input Di through the MUX core to outputs Y and inverted output W (Ȳ).
+- Dual Boolean Expression Engine:
+  * Canonical SOP Equation: Y = Ē' · [ S1'S0'·D0 + S1'S0·D1 + ... ] with live
+    active term highlighting.
+  * Minimized Boolean Function: Dynamically reduces active data inputs (D0..Dn)
+    into a fully simplified Boolean equation (e.g. Y = S1·S0, Y = S1'S0 + S1S0',
+    Y = S1 + S0, Y = 1, or Y = 0).
+- Universal Logic Generator:
+  * Synthesizes standard Boolean functions (AND, OR, XOR, XNOR, Majority, Full
+    Adder Sum) directly on the multiplexer. Displays both canonical minterm
+    expansions and simplified expressions.
+
+--------------------------------------------------------------------------------
+5. UI/UX & DESIGN SYSTEM INTEGRATION (style.css)
+--------------------------------------------------------------------------------
+- 100% strict adherence to existing `:root` CSS custom properties:
+  * `--bg`: #0b1512 (deep cyber dark background)
+  * `--panel`, `--panel-2`: #12211b, #16281f (elevated card panels)
+  * `--signal`, `--signal-dim`: #6bffb0, #2f6e4f (neon high-voltage green)
+  * `--amber`, `--amber-dim`: #ffbe5c, #7a5a26 (warning / select indicators)
+  * `--red`, `--red-dim`: #ff6b6b, #6e2f2f (error / strobe alerts)
+  * `--line`, `--line-soft`: #24382f, #1b2c24 (circuit wire borders)
+  * `--font-display`, `--font-data`: Space Mono / IBM Plex Mono
+  * `--font-body`: Inter
+- Added sleek styling for top navigation tabs, K-Map matrices, grouping overlays,
+  interactive bit toggles, ripple carry slices, and schematic diagrams.
+
+--------------------------------------------------------------------------------
+6. TEST SUITE & DOCUMENTATION (test_modules.js, README.md)
+--------------------------------------------------------------------------------
+- Created `test_modules.js` automated unit test suite with 100% pass rate:
+  * K-Map Gray code indexing (2x2, 2x4, 4x4, 4-corners).
+  * Half/Full Adders & Subtractors across all input combinations.
+  * Multi-bit addition with Cin=0/1 and signed overflow edge cases.
+  * Multi-bit subtraction with Cin=1 (2's complement) and Cin=0 (1's complement).
+  * Signed overflow detection (V = Cn ^ Cn-1) across positive and negative bounds.
+  * Multiplexer signal routing and Boolean expression minimization.
+- Updated `README.md` with complete documentation, mathematical notes, file
+  descriptions, and local running / deployment guides.
+
+================================================================================
+File Index
+================================================================================
+- `index.html`          — Top-level navigation and 4-module semantic UI structure
+- `style.css`           — Complete CSS design system and component styling
+- `ui.js`               — Top-level tab navigation, URL hash router, and module hooks
+- `kmaps.js`            — K-Map solver, Gray-code mapper, toroidal grouping engine
+- `arithmetic.js`       — 1–4 bit Adders/Subtractors, ripple carry visualizer, 2's compl
+- `mux.js`              — Multiplexer simulator, signal bus visualizer, logic simplifier
+- `canvas.js`           — Kinetic background particle canvas engine
+- `test_modules.js`     — Automated unit test suite
+- `README.md`           — Complete project documentation
+- `CHANGES_SUMMARY.txt` — This summary file
+- `logic.js`            — [Preserved] Quine–McCluskey minimization engine
+- `diagram.js`          — [Preserved] SVG gate diagram renderer
+- `app.js`              — [Preserved] BoolSynth synthesizer controller
+================================================================================

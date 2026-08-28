@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BoolSynth — Digital Logic Suite</title>
+<meta name="description" content="Complete digital logic suite: Boolean function synthesis, Quine-McCluskey minimization, interactive K-Map solver, 1-4 bit binary adders/subtractors, and multiplexer signal routing simulator." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Digital Logic Toolkit</div>
+  <h1 class="title">Bool<span>Synth</span></h1>
+  <p class="hero-sub">
+    Synthesize and minimize Boolean functions, solve interactive Karnaugh Maps, simulate
+    multi-bit ripple carry adders &amp; subtractors, and route signals through multiplexers.
+  </p>
+  <svg class="hero-trace" viewBox="0 0 1000 90" preserveAspectRatio="none" aria-hidden="true">
+    <path class="rail" d="M0,45 H180 V15 H340 V75 H520 V45 H700 V20 H860 V45 H1000" />
+    <path class="pulse-path" d="M0,45 H180 V15 H340 V75 H520 V45 H700 V20 H860 V45 H1000" />
+    <circle class="node" cx="180" cy="15" r="4"/>
+    <circle class="node" cx="340" cy="75" r="4"/>
+    <circle class="node" cx="520" cy="45" r="4"/>
+    <circle class="node" cx="700" cy="20" r="4"/>
+    <circle class="node" cx="860" cy="45" r="4"/>
+    <text x="10" y="38">IN</text>
+    <text x="955" y="38">F</text>
+  </svg>
+</header>
+
+<!-- Top-level module navigation -->
+<nav class="main-nav" aria-label="Main Navigation">
+  <div class="nav-tabs" role="tablist">
+    <button class="nav-tab-btn active" data-target="module-boolsynth" role="tab" aria-selected="true">
+      <span class="nav-icon">⚡</span> BoolSynth
+    </button>
+    <button class="nav-tab-btn" data-target="module-kmaps" role="tab" aria-selected="false">
+      <span class="nav-icon">⊞</span> K-Maps
+    </button>
+    <button class="nav-tab-btn" data-target="module-arithmetic" role="tab" aria-selected="false">
+      <span class="nav-icon">∑</span> Arithmetic
+    </button>
+    <button class="nav-tab-btn" data-target="module-mux" role="tab" aria-selected="false">
+      <span class="nav-icon">🔀</span> Multiplexers
+    </button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- =========================================================================
+       MODULE 1: BoolSynth (Circuit Synthesizer)
+       ========================================================================= -->
+  <div id="module-boolsynth" class="module-panel active">
+    <section class="panel">
+      <h2><span class="num">01</span> Define the function</h2>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tt">Truth Table</button>
+        <button class="tab-btn" data-tab="mm">Minterms / Maxterms</button>
+        <button class="tab-btn" data-tab="expr">Expression</button>
+      </div>
+
+      <!-- Truth table tab -->
+      <div class="tab-panel active" id="panel-tt">
+        <div class="row">
+          <div>
+            <label class="field-label" for="tt-numvars">Number of variables</label>
+            <select id="tt-numvars">
+              <option value="2">2 (A, B)</option>
+              <option value="3" selected>3 (A, B, C)</option>
+              <option value="4">4 (A, B, C, D)</option>
+              <option value="5">5 (A, B, C, D, E)</option>
+              <option value="6">6 (A, B, C, D, E, F)</option>
+            </select>
+          </div>
+        </div>
+        <p class="hint">Click a cell in the Output column to cycle it: 0 → 1 → X (don't care) → 0.</p>
+        <div id="tt-input-container"></div>
+      </div>
+
+      <!-- Minterm/Maxterm tab -->
+      <div class="tab-panel" id="panel-mm">
+        <div class="row">
+          <div>
+            <label class="field-label" for="mm-numvars">Number of variables</label>
+            <select id="mm-numvars">
+              <option value="2">2 (A, B)</option>
+              <option value="3" selected>3 (A, B, C)</option>
+              <option value="4">4 (A, B, C, D)</option>
+              <option value="5">5 (A, B, C, D, E)</option>
+              <option value="6">6 (A, B, C, D, E, F)</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Mode</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mm-mode" value="min" checked> Minterms (Σm)</label>
+              <label class="radio-opt"><input type="radio" name="mm-mode" value="max"> Maxterms (ΠM)</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label class="field-label" for="mm-list">Indices (comma or space separated)</label>
+            <input type="text" id="mm-list" placeholder="e.g. 0, 2, 5, 7" />
+          </div>
+          <div>
+            <label class="field-label" for="mm-dc">Don't-care indices (optional)</label>
+            <input type="text" id="mm-dc" placeholder="e.g. 3, 6" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Expression tab -->
+      <div class="tab-panel" id="panel-expr">
+        <label class="field-label" for="expr-input">Boolean expression</label>
+        <input type="text" id="expr-input" placeholder="e.g. A.B + A'.C  or  (A+B).!C  or  A XOR B" />
+        <p class="hint">
+          Operators: <code>.</code> <code>&amp;</code> <code>*</code> or space for AND · <code>+</code> <code>|</code> for OR ·
+          <code>!</code> <code>~</code> or trailing <code>'</code> for NOT · <code>XOR</code> / <code>XNOR</code> supported ·
+          parentheses allowed. Variables are single letters (A–F).
+        </p>
+        <div class="examples">
+          <span class="example-chip" data-expr="A.B + A'.C">A.B + A'.C</span>
+          <span class="example-chip" data-expr="(A+B).(A+C')">(A+B).(A+C')</span>
+          <span class="example-chip" data-expr="A XOR B XOR C">A XOR B XOR C</span>
+          <span class="example-chip" data-expr="A'B'C' + A'B'C + ABC">A'B'C' + A'B'C + ABC</span>
+        </div>
+      </div>
+
+      <div style="margin-top:26px;">
+        <button class="btn-primary" id="synthesize-btn">Synthesize circuit →</button>
+      </div>
+
+      <div class="error-box" id="error-box" style="display:none;"></div>
+    </section>
+
+    <section id="results">
+
+      <section class="panel">
+        <h2><span class="num">02</span> Minimized expression</h2>
+        <div class="expr-display">
+          <span class="lbl">Sum of products (SOP) — minimal</span>
+          <span id="res-expr"></span>
+        </div>
+        <div class="expr-display" style="margin-top:14px;">
+          <span class="lbl">Product of sums (POS) — minimal</span>
+          <span id="res-pos-expr"></span>
+        </div>
+        <div class="stat-row" style="margin-top:22px;">
+          <div class="stat"><span class="n" id="stat-vars"></span><span class="l">Variables</span></div>
+          <div class="stat"><span class="n" id="stat-terms"></span><span class="l">Product terms</span></div>
+          <div class="stat"><span class="n" id="stat-literals"></span><span class="l">Literals</span></div>
+          <div class="stat"><span class="n" id="stat-rows"></span><span class="l">Input rows</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2><span class="num">03</span> Truth table</h2>
+        <div id="res-tt"></div>
+      </section>
+
+      <section class="panel">
+        <h2><span class="num">04</span> Circuit implementations</h2>
+
+        <div class="diagram-card">
+          <div class="dc-head">
+            <h3>AND · OR · NOT (basic gates)</h3>
+            <span class="dc-expr" id="res-basic-expr"></span>
+          </div>
+          <div class="dc-body" id="res-basic-svg"></div>
+        </div>
+
+        <div class="diagram-card">
+          <div class="dc-head">
+            <h3>NAND-only implementation</h3>
+            <span class="dc-expr">two-level NAND–NAND, derived from the SOP</span>
+          </div>
+          <div class="dc-body" id="res-nand-svg"></div>
+        </div>
+
+        <div class="diagram-card">
+          <div class="dc-head">
+            <h3>NOR-only implementation</h3>
+            <span class="dc-expr">two-level NOR–NOR, derived from the POS</span>
+          </div>
+          <div class="dc-body" id="res-nor-svg"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2><span class="num">05</span> Equivalence verification</h2>
+        <div class="verify-banner" id="verify-banner"></div>
+        <div id="res-verify-table"></div>
+      </section>
+
+    </section>
+  </div>
+
+
+  <!-- =========================================================================
+       MODULE 2: Interactive K-Map Solver
+       ========================================================================= -->
+  <div id="module-kmaps" class="module-panel">
+    <section class="panel">
+      <h2><span class="num">01</span> Interactive Karnaugh Map</h2>
+
+      <!-- Variable selector tabs -->
+      <div id="kmap-var-selector" style="margin-bottom:20px;"></div>
+
+      <div class="row" style="align-items:center; justify-content:space-between; margin-bottom:18px;">
+        <div style="min-width:240px;">
+          <label class="field-label" for="kmap-preset-select">Preset Examples</label>
+          <select id="kmap-preset-select"></select>
+        </div>
+        <div>
+          <label class="field-label">Grouping Mode</label>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="kmap-opt-mode" value="sop" checked> SOP (Group 1s + Xs)</label>
+            <label class="radio-opt"><input type="radio" name="kmap-opt-mode" value="pos"> POS (Group 0s + Xs)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main K-Map Grid & Tools -->
+      <div class="kmap-wrapper">
+        <div id="kmap-grid-wrapper"></div>
+
+        <div style="flex:1; min-width:260px;">
+          <label class="field-label">Quick Actions</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+            <button class="btn-secondary" id="kmap-btn-clear">Clear (All 0)</button>
+            <button class="btn-secondary" id="kmap-btn-fill">Set All 1</button>
+            <button class="btn-secondary" id="kmap-btn-invert">Invert 0 ↔ 1</button>
+            <button class="btn-secondary" id="kmap-btn-random">Random</button>
+          </div>
+          <p class="hint">Click any cell to cycle its state: <strong>0 → 1 → X (Don't Care) → 0</strong>.<br/>Loops highlight minimal prime implicants with wrap-around support.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Minimized Equation Result -->
+    <section class="panel">
+      <h2><span class="num">02</span> Minimized Expression</h2>
+      <div class="expr-display">
+        <span class="lbl">Optimal Minimized SOP (Sum of Products)</span>
+        <span id="kmap-res-sop">F = 0</span>
+      </div>
+      <div class="expr-display" style="margin-top:14px;">
+        <span class="lbl">Optimal Minimized POS (Product of Sums)</span>
+        <span id="kmap-res-pos">F = 1</span>
+      </div>
+      <div id="kmap-res-canonical" style="margin-top:18px; font-family:var(--font-data); font-size:13.5px;"></div>
+      <div style="margin-top:20px;">
+        <button class="btn-primary" id="kmap-btn-send-to-synth">Synthesize Circuit in BoolSynth →</button>
+      </div>
+    </section>
+
+    <!-- Grouping Breakdown Table -->
+    <section class="panel">
+      <h2><span class="num">03</span> Optimal Implicant Groupings</h2>
+      <div id="kmap-groups-table"></div>
+    </section>
+  </div>
+
+
+  <!-- =========================================================================
+       MODULE 3: Binary Arithmetic Engine
+       ========================================================================= -->
+  <div id="module-arithmetic" class="module-panel">
+    <!-- Sub-navigation for arithmetic units -->
+    <div id="arithmetic-subnav" style="margin-bottom:20px;"></div>
+
+    <!-- Multi-bit Adder / Subtractor View -->
+    <div id="arith-view-multibit" class="arith-view"></div>
+
+    <!-- 1-Bit Full Adder View -->
+    <div id="arith-view-fa" class="arith-view" style="display:none;"></div>
+
+    <!-- 1-Bit Half Adder View -->
+    <div id="arith-view-ha" class="arith-view" style="display:none;"></div>
+
+    <!-- 1-Bit Full Subtractor View -->
+    <div id="arith-view-fs" class="arith-view" style="display:none;"></div>
+
+    <!-- 1-Bit Half Subtractor View -->
+    <div id="arith-view-hs" class="arith-view" style="display:none;"></div>
+  </div>
+
+
+  <!-- =========================================================================
+       MODULE 4: Multiplexer Simulator
+       ========================================================================= -->
+  <div id="module-mux" class="module-panel">
+    <section class="panel">
+      <h2><span class="num">01</span> Multiplexer Signal Routing</h2>
+
+      <!-- Type selector -->
+      <div id="mux-type-selector" style="margin-bottom:20px;"></div>
+
+      <!-- Controls for data and select lines -->
+      <div id="mux-controls-container"></div>
+
+      <!-- Interactive SVG Schematic -->
+      <div class="diagram-card" style="margin-top:20px;">
+        <div class="dc-head">
+          <h3>Signal Routing Schematic</h3>
+          <span class="dc-expr">Active channel glows neon green</span>
+        </div>
+        <div class="dc-body" id="mux-schematic-svg" style="padding:20px; text-align:center;"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="num">02</span> Routing Equation &amp; Truth Table</h2>
+      <div id="mux-equation-display" style="margin-bottom:20px;"></div>
+      <div id="mux-truth-table"></div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="num">03</span> Universal Logic Module (Function Synthesis)</h2>
+      <p class="hint" style="margin-bottom:14px;">
+        Any Boolean function can be implemented using a multiplexer as a universal logic element without additional logic gates.
+      </p>
+      <div class="row" style="align-items:center;">
+        <div style="flex:1;">
+          <label class="field-label" for="mux-universal-select">Select Function to Synthesize with MUX</label>
+          <select id="mux-universal-select"></select>
+        </div>
+      </div>
+      <div id="mux-universal-desc"></div>
+    </section>
+  </div>
+
+</main>
+
+<!-- Floating Kinetic Background Toggle Switch -->
+<aside class="kinetic-toggle-container" aria-label="Background Animation Controls">
+  <label class="kinetic-switch" for="kinetic-bg-toggle" title="Toggle interactive physics-based background particles">
+    <input type="checkbox" id="kinetic-bg-toggle" aria-label="Toggle Kinetic Background Animation" />
+    <span class="kinetic-slider"></span>
+    <span class="kinetic-label"><span class="kinetic-icon">⚡</span> Kinetic Background</span>
+  </label>
+</aside>
+
+<!-- Full-screen Kinetic Background Canvas -->
+<canvas id="kinetic-canvas" class="kinetic-canvas" style="display: none;"></canvas>
+
+<footer>
+  BoolSynth runs entirely in your browser — no data leaves your device. Minimization via Quine–McCluskey and Karnaugh Map prime-implicant extraction.
+</footer>
+
+<script src="logic.js"></script>
+<script src="diagram.js"></script>
+<script src="app.js"></script>
+<script src="kmaps.js"></script>
+<script src="arithmetic.js"></script>
+<script src="mux.js"></script>
+<script src="canvas.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
