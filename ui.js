@@ -70,7 +70,9 @@
       'adder': 'module-arithmetic',
       'subtractor': 'module-arithmetic',
       'mux': 'module-mux',
-      'multiplexer': 'module-mux'
+      'multiplexer': 'module-mux',
+      'ai': 'module-ai',
+      'assistant': 'module-ai'
     };
     const targetId = map[rawHash] || 'module-boolsynth';
     switchTab(targetId);

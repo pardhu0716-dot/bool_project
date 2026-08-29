@@ -56,7 +56,27 @@ A client-side digital logic toolkit with zero build steps or external dependenci
 
 ---
 
-### 5. ⚡ Kinetic Background Engine (`canvas.js`)
+### 5. 🤖 AI Digital Logic Assistant & Deterministic Verification Engine (`ai.js`)
+- **Domain-Restricted Conversational AI**: Dedicated digital logic assistant powered by Google Gemini Interactions API (`gemini-3.6-flash`).
+- **Strict Domain Boundary**: Answers only questions concerning Boolean algebra, digital logic, logic gates, truth tables, K-maps, SOP/POS, digital circuit analysis, and the BoolSynth toolkit. Automatically rejects all unrelated inquiries with a standardized domain refusal.
+- **Deterministic Verification Engine (`logic.js` Authority)**: Connects AI outputs to `logic.js` (`parseExpression`, `evalAst`, `quineMcCluskey`, `sopFromPIs`, `minimize`) to perform 5 independent mathematical checks:
+  1. *Check 1 (Required 1s)*: Evaluates AST across all required minterms to ensure output is 1.
+  2. *Check 2 (Required 0s)*: Evaluates AST across all 0-minterms to ensure output is 0.
+  3. *Check 3 (Don't-Care Handling)*: Ensures don't-care rows are not falsely required to be 1.
+  4. *Check 4 (Syntax & Variable Validity)*: Validates AST parsing and verifies that all variables match the problem specification.
+  5. *Check 5 (Minimality)*: Compares literal count against the Quine-McCluskey minimal cover.
+- **Automatic Deterministic Correction**: If the AI output fails any check, the mathematically authoritative solution computed by `logic.js` is automatically substituted before display.
+- **Problem Statement Translation**: Converts natural-language problem descriptions directly into **pure Boolean expressions** (without unnecessary explanatory text).
+- **Exact Syntax Enforcement**: Automatically normalizes expressions to enforce explicit dot multiplication (`.`), OR (`+`), NOT prime (`'`), and parentheses (`( )`).
+- **Dedicated Expression Card**:
+  - **Verification Badges**: Live badges indicating `✓ VERIFIED by Boolean engine` or `⚡ CORRECTED by Boolean engine`.
+  - **Copy to Clipboard Button**: Copies *only* the clean algebraic expression.
+  - **Synthesize Circuit in BoolSynth Button**: Instantly loads the expression into the BoolSynth engine and generates all 3 gate schematics and equivalence verification.
+- **Client-Side Key Protection**: API keys are stored solely in local browser storage and transmitted directly to Google Gemini via HTTPS.
+
+---
+
+### 6. ⚡ Kinetic Background Engine (`canvas.js`)
 - **Physics-Based Particle System**: Interactive 2D particles drifting gently in the background with circuit constellation lines.
 - **Cursor Repulsion**: Particles smoothly dodge and accelerate away from the mouse cursor using inverse-distance force calculations.
 - **Click Energy Bursts**: Clicking on empty space spawns explosive particle bursts with decaying velocities and alpha trails.
@@ -67,9 +87,10 @@ A client-side digital logic toolkit with zero build steps or external dependenci
 ## File Structure
 
 ```
-├── index.html            — Page structure, top-level navigation, and module layouts
-├── style.css             — Design tokens, dark theme, interactive grids, schematics, and animations
+├── index.html            — Page structure, top-level navigation, and 5 module layouts
+├── style.css             — Design tokens, dark theme, interactive grids, AI chat, and schematics
 ├── ui.js                 — Top-level tab switching, URL hash routing, and cross-module bridge
+├── ai.js                 — Domain-restricted AI conversational assistant, syntax normalizer, copy/synth bridge
 ├── kmaps.js              — Karnaugh Map solver, Gray-code mapper, toroidal grouping, minimal cover
 ├── arithmetic.js         — 1–4 bit Adders/Subtractors, ripple carry visualizer, 2's complement logic
 ├── mux.js                — Multiplexer simulator, signal bus visualizer, Universal Logic builder

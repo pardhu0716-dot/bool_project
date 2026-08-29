@@ -46,6 +46,9 @@
     <button class="nav-tab-btn" data-target="module-mux" role="tab" aria-selected="false">
       <span class="nav-icon">🔀</span> Multiplexers
     </button>
+    <button class="nav-tab-btn" data-target="module-ai" role="tab" aria-selected="false">
+      <span class="nav-icon">🤖</span> AI Assistant
+    </button>
   </div>
 </nav>
 
@@ -336,7 +339,78 @@
     </section>
   </div>
 
+  <!-- =========================================================================
+       MODULE 5: Domain-Restricted AI Assistant
+       ========================================================================= -->
+  <div id="module-ai" class="module-panel">
+    <section class="panel ai-panel-container">
+      <div class="ai-header-bar">
+        <div>
+          <h2><span class="num">01</span> AI Digital Logic Assistant</h2>
+          <p class="hint" style="margin-top:4px;">
+            Specialized conversational AI strictly restricted to Boolean algebra, digital circuits, and logic design.
+          </p>
+        </div>
+        <div id="ai-key-status-container"></div>
+      </div>
+
+      <!-- Quick Problem Example Chips -->
+      <div class="ai-example-section">
+        <label class="field-label">Try an example problem statement:</label>
+        <div class="examples" style="margin-top:6px;">
+          <span class="example-chip ai-example-chip" data-prompt="A laboratory access door opens if master keycard (A) is present and either security PIN (B) or biometric (C) is valid, or if emergency override (D) is active with either PIN (B) or biometric (C). What is the Boolean expression?">🔬 Lab Access Door (A, B, C, D)</span>
+          <span class="example-chip ai-example-chip" data-prompt="A priority traffic signal controller turns green if emergency vehicle sensor (A) is active, or if main road sensor (B) is active and cross street sensor (C) is inactive. Give the Boolean expression.">🚦 Priority Traffic Light (A, B, C)</span>
+          <span class="example-chip ai-example-chip" data-prompt="An industrial tank alarm sounds if High Pressure (A) is detected and either High Temperature (B) or Low Coolant (C) is active, or if both High Temperature (B) and Low Coolant (C) are active simultaneously.">🏭 Tank Alarm (A, B, C)</span>
+          <span class="example-chip ai-example-chip" data-prompt="Explain De Morgan's laws for Boolean algebra and how they apply to NAND and NOR gates.">❓ Explain De Morgan's Laws</span>
+          <span class="example-chip ai-example-chip" data-prompt="What is the weather in Paris today?">🚫 Test Domain Rejection (Weather)</span>
+        </div>
+      </div>
+
+      <!-- Chat Stream Container -->
+      <div class="ai-chat-stream-box" id="ai-chat-stream"></div>
+
+      <!-- Chat Input Area -->
+      <div class="ai-input-wrapper">
+        <div class="ai-input-row">
+          <textarea id="ai-chat-input" class="ai-chat-textarea" placeholder="Paste a Boolean problem statement or ask a digital logic question... (Press Enter to send, Shift+Enter for newline)" rows="1"></textarea>
+          <div class="ai-input-actions">
+            <button class="btn-secondary" id="ai-btn-clear-chat" title="Clear chat history">Clear</button>
+            <button class="btn-primary" id="ai-btn-send" title="Send message to AI">Send →</button>
+          </div>
+        </div>
+        <div class="ai-footer-note">
+          <span>🔒 Domain-Restricted to Digital Logic &amp; Boolean Algebra</span>
+          <span>⚡ Direct Synthesis Bridge to BoolSynth Engine</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
 </main>
+
+<!-- API Key Configuration Modal -->
+<div id="ai-key-modal" class="ai-modal-backdrop" style="display:none;" role="dialog" aria-labelledby="ai-key-modal-title" aria-modal="true">
+  <div class="ai-modal-card">
+    <div class="ai-modal-head">
+      <h3 id="ai-key-modal-title">🔑 Google Gemini API Key Settings</h3>
+      <button class="ai-modal-close" id="ai-btn-close-key" aria-label="Close API Key Settings">×</button>
+    </div>
+    <div class="ai-modal-body">
+      <p class="hint" style="margin-bottom:14px; line-height:1.5;">
+        Enter your Google Gemini API Key to enable the AI Digital Logic Assistant. Your key is stored <strong>exclusively in your local browser storage</strong> and sent directly to Google's official Gemini endpoint over HTTPS.
+      </p>
+      <label class="field-label" for="ai-key-input">Gemini API Key</label>
+      <input type="password" id="ai-key-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false" />
+      <div class="hint" style="margin-top:8px;">
+        Don't have an API key? You can generate a free Gemini key in seconds at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:var(--signal); text-decoration:underline;">Google AI Studio ↗</a>.
+      </div>
+    </div>
+    <div class="ai-modal-foot">
+      <button class="btn-secondary" onclick="document.getElementById('ai-key-modal').style.display='none'">Cancel</button>
+      <button class="btn-primary" id="ai-btn-save-key">Save Key</button>
+    </div>
+  </div>
+</div>
 
 <!-- Floating Kinetic Background Toggle Switch -->
 <aside class="kinetic-toggle-container" aria-label="Background Animation Controls">
@@ -360,6 +434,7 @@
 <script src="kmaps.js"></script>
 <script src="arithmetic.js"></script>
 <script src="mux.js"></script>
+<script src="ai.js"></script>
 <script src="canvas.js"></script>
 <script src="ui.js"></script>
 </body>
